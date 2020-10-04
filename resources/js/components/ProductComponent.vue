@@ -165,8 +165,10 @@ export default {
     },
     methods: {
         productSearch() {
+            this.$Progress.start();
             axios.get("/api/product?search=" + this.search).then(res => {
                 this.products = res.data;
+                this.$Progress.finish();
             });
         },
 
@@ -223,6 +225,7 @@ export default {
                 .then(res => {
                     this.productList();
                     this.product.reset();
+                    this.create();
                     Toast.fire({
                         icon: "success",
                         title: "Edited successfully"

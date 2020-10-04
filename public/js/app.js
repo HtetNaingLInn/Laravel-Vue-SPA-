@@ -2110,8 +2110,11 @@ __webpack_require__.r(__webpack_exports__);
     productSearch: function productSearch() {
       var _this = this;
 
+      this.$Progress.start();
       axios.get("/api/product?search=" + this.search).then(function (res) {
         _this.products = res.data;
+
+        _this.$Progress.finish();
       });
     },
     productList: function productList() {
@@ -2169,6 +2172,8 @@ __webpack_require__.r(__webpack_exports__);
         _this4.productList();
 
         _this4.product.reset();
+
+        _this4.create();
 
         Toast.fire({
           icon: "success",
