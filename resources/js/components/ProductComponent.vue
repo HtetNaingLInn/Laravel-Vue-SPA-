@@ -129,15 +129,30 @@
                 ></pagination>
             </div>
         </div>
+        <loading
+            :active.sync="isLoading"
+            :is-full-page="true"
+            :color="color"
+            :loader="loader"
+        ></loading>
     </div>
 </template>
 
 <script>
+import Loading from "vue-loading-overlay";
+
+import "vue-loading-overlay/dist/vue-loading.css";
 export default {
     name: "ProductComponent.vue",
+    components: {
+        Loading
+    },
     data() {
         return {
             editMode: false,
+            isLoading: false,
+            color: "#3490dc",
+            loader: "bars",
             search: "",
             products: {},
             error: "",
@@ -156,11 +171,13 @@ export default {
         },
 
         productList(page = 1) {
+            this.isLoading = true;
             this.$Progress.start();
             axios.get("/api/product?page=" + page).then(res => {
                 this.products = res.data;
+                this.isLoading = false;
+                this.$Progress.finish();
             });
-            this.$Progress.finish();
         },
 
         productCreate() {
@@ -170,6 +187,10 @@ export default {
                 .then(res => {
                     this.productList();
                     this.product.reset();
+                    Toast.fire({
+                        icon: "success",
+                        title: "Created successfully"
+                    });
                 })
                 .catch(err => {
                     this.error = err.response.data.message;
@@ -202,6 +223,10 @@ export default {
                 .then(res => {
                     this.productList();
                     this.product.reset();
+                    Toast.fire({
+                        icon: "success",
+                        title: "Edited successfully"
+                    });
                 })
                 .catch(err => {
                     this.error = err.response.data.message;
@@ -211,12 +236,31 @@ export default {
 
         productDelete(id) {
             this.$Progress.start();
-            if (!confirm("Are you sure to Delete")) {
-                return;
-            }
-            axios.delete(`/api/product/${id}`).then(res => {
-                this.productList();
+            Swal.fire({
+                title: "Are you sure?",
+                text: "",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Delete it!"
+            }).then(result => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Deleted",
+                        text: "Your file has been deleted.",
+                        icon: "success"
+                    });
+                    axios.delete(`/api/product/${id}`).then(res => {
+                        this.productList();
+                    });
+                    Toast.fire({
+                        icon: "success",
+                        title: "Deleted successfully"
+                    });
+                }
             });
+
             this.$Progress.finish();
         }
     },
