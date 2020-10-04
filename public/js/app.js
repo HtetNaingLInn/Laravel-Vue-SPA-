@@ -2029,32 +2029,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "ProductComponent.vue",
   data: function data() {
     return {
       editMode: false,
+      search: "",
       products: {},
       product: {
         id: "",
@@ -2064,27 +2044,33 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    productList: function productList() {
+    productSearch: function productSearch() {
       var _this = this;
+
+      axios.get("/api/product?search=" + this.search).then(function (res) {
+        _this.products = res.data;
+      });
+    },
+    productList: function productList() {
+      var _this2 = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
       this.$Progress.start();
       axios.get("/api/product?page=" + page).then(function (res) {
-        _this.products = res.data;
+        _this2.products = res.data;
       });
       this.$Progress.finish();
     },
     productCreate: function productCreate() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.$Progress.start();
       axios.post("/api/product", this.product).then(function (res) {
-        _this2.productList();
+        _this3.productList();
 
-        _this2.product = {
-          name: "",
-          price: ""
-        };
+        _this3.product.id = "";
+        _this3.product.name = "";
+        _this3.product.price = "";
       });
       this.$Progress.finish();
     },
@@ -2105,20 +2091,20 @@ __webpack_require__.r(__webpack_exports__);
       this.$Progress.finish();
     },
     productUpdate: function productUpdate() {
-      var _this3 = this;
+      var _this4 = this;
 
       this.$Progress.start();
       axios.put("/api/product/".concat(this.product.id), this.product).then(function (res) {
-        _this3.productList();
+        _this4.productList();
 
-        _this3.products.id = "";
-        _this3.product.name = "";
-        _this3.product.price = "";
+        _this4.products.id = "";
+        _this4.product.name = "";
+        _this4.product.price = "";
       });
       this.$Progress.finish();
     },
     productDelete: function productDelete(id) {
-      var _this4 = this;
+      var _this5 = this;
 
       this.$Progress.start();
 
@@ -2127,7 +2113,7 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       axios["delete"]("/api/product/".concat(id)).then(function (res) {
-        _this4.productList();
+        _this5.productList();
       });
       this.$Progress.finish();
     }
@@ -38371,12 +38357,51 @@ var render = function() {
               { staticClass: "btn btn-primary", on: { click: _vm.create } },
               [
                 _c("i", { staticClass: "fas fa-plus-circle" }),
-                _vm._v(" Create\n                    ")
+                _vm._v(" Create\n          ")
               ]
             )
           ]),
           _vm._v(" "),
-          _vm._m(0)
+          _c("div", { staticClass: "col-md-6" }, [
+            _c(
+              "form",
+              {
+                on: {
+                  submit: function($event) {
+                    $event.preventDefault()
+                    return _vm.productSearch()
+                  }
+                }
+              },
+              [
+                _c("div", { staticClass: "input-group" }, [
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.search,
+                        expression: "search"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "text", placeholder: "search" },
+                    domProps: { value: _vm.search },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.search = $event.target.value
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _vm._m(0)
+                ])
+              ]
+            )
+          ])
         ])
       ])
     ]),
@@ -38386,11 +38411,7 @@ var render = function() {
         _c("div", { staticClass: "card" }, [
           _c("div", { staticClass: "card-header" }, [
             _c("h4", { staticClass: "text-info" }, [
-              _vm._v(
-                "\n                        " +
-                  _vm._s(_vm.editMode ? "edit" : "create") +
-                  "\n                    "
-              )
+              _vm._v(_vm._s(_vm.editMode ? "edit" : "create"))
             ])
           ]),
           _vm._v(" "),
@@ -38495,7 +38516,7 @@ var render = function() {
                       },
                       [
                         _c("i", { staticClass: "fas fa-edit" }),
-                        _vm._v(" Edit\n                            ")
+                        _vm._v(" Edit\n              ")
                       ]
                     ),
                     _vm._v(" "),
@@ -38511,7 +38532,7 @@ var render = function() {
                       },
                       [
                         _c("i", { staticClass: "fas fa-trash-alt" }),
-                        _vm._v(" Delete\n                            ")
+                        _vm._v(" Delete\n              ")
                       ]
                     )
                   ])
@@ -38537,21 +38558,12 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-md-6" }, [
-      _c("form", [
-        _c("div", { staticClass: "input-group" }, [
-          _c("input", {
-            staticClass: "form-control",
-            attrs: { type: "text", placeholder: "search" }
-          }),
-          _vm._v(" "),
-          _c("div", { staticClass: "input-group-append" }, [
-            _c("button", { staticClass: "btn btn-primary" }, [
-              _c("i", { staticClass: "fas fa-search" })
-            ])
-          ])
-        ])
-      ])
+    return _c("div", { staticClass: "input-group-append" }, [
+      _c(
+        "button",
+        { staticClass: "btn btn-primary", attrs: { type: "submit" } },
+        [_c("i", { staticClass: "fas fa-search" })]
+      )
     ])
   },
   function() {
@@ -38561,10 +38573,7 @@ var staticRenderFns = [
     return _c(
       "button",
       { staticClass: "btn btn-primary", attrs: { type: "submit" } },
-      [
-        _c("i", { staticClass: "fas fa-save" }),
-        _vm._v("  Save\n                        ")
-      ]
+      [_c("i", { staticClass: "fas fa-save" }), _vm._v("  Save\n            ")]
     )
   },
   function() {
