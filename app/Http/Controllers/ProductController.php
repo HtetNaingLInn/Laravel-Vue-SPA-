@@ -29,7 +29,7 @@ class ProductController extends Controller
         return $product;
     }
 
-    public function update(Request $request, Product $product)
+    public function update(ProductRequest $request, Product $product)
     {
 
         $product->update($request->only('name', 'price'));
@@ -39,7 +39,7 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        $product->delete();
-        return response()->json(['data' => 'deletd'], 200);
+        return $product->delete();
+
     }
 }
